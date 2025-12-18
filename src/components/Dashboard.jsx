@@ -24,6 +24,26 @@ function Dashboard() {
 
   useEffect(() => {
     fetchMetrics();
+
+    const channel = supabase
+      .channel("deal-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "sales_deals",
+        },
+        (payload) => {
+          fetchMetrics();
+        }
+      )
+      .subscribe();
+
+    // Clean up subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const chartData = [
