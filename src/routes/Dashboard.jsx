@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import supabase from "../supabase-client";
 import { Chart } from "react-charts";
-import Form from "./Form";
+import Form from "../components/Form";
 
 function Dashboard() {
   const [metrics, setMetrics] = useState([]);
@@ -35,7 +35,7 @@ function Dashboard() {
           schema: "public",
           table: "sales_deals",
         },
-        (payload) => {
+        () => {
           fetchMetrics();
         }
       )
