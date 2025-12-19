@@ -18,7 +18,7 @@ const Signup = () => {
           <h2 className="form-title">Sign up today!</h2>
           <p>
             Already have an account?{" "}
-            <Link className="form-link" to="/">
+            <Link className="form-link" to="/signin">
               Sign in
             </Link>
           </p>

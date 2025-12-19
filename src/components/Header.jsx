@@ -14,7 +14,7 @@ function Header() {
     const { success, error } = await signOut();
 
     if (success) {
-      navigate("/");
+      navigate("/signin");
     }
 
     if (error) {
