@@ -51,6 +51,25 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  const signUpUser = async (email, password) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.toLowerCase(),
+        password: password,
+      });
+      if (error) {
+        console.error("Supabase sign-up error:", error.message);
+        return { success: false, error: error.message };
+      }
+      console.log("Supabase sign-up success:", data);
+      return { success: true, data };
+    } catch (error) {
+      //Unexpected error
+      console.error("Unexpected error during sign-up:", error.message);
+      return { success: false, error: "An unexpected error occurred." };
+    }
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -67,7 +86,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ session, signInUser, signOut }}>
+    <AuthContext.Provider value={{ session, signInUser, signOut, signUpUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,12 +1,37 @@
-import { Link } from "react-router-dom";
+import { useActionState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
+  const { signUpUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [error, submitAction, isPending] = useActionState(
+    async (previousState, formData) => {
+      //1. Extract form data
+      const email = formData.get("email");
+      const password = formData.get("password");
+
+      const { success, data, error } = await signUpUser(email, password);
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      if (success && data?.session) {
+        navigate("/dashboard");
+        return null;
+      }
+      return null;
+    },
+    null
+  );
+
   return (
     <>
       <h1 className="landing-header">Paper Like A Boss</h1>
       <div className="sign-form-container">
         <form
-          // action={}
+          action={submitAction}
           aria-label="Sign up form"
           aria-describedby="form-description"
         >
@@ -32,9 +57,9 @@ const Signup = () => {
             placeholder=""
             required
             aria-required="true"
-            //aria-invalid=
-            //aria-describedby=
-            //disabled=
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby="email-error"
+            disabled={isPending}
           />
 
           <label htmlFor="password">Password</label>
@@ -46,22 +71,29 @@ const Signup = () => {
             placeholder=""
             required
             aria-required="true"
-            //aria-invalid=
-            //aria-describedby=
-            //disabled=
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby="password-error"
+            disabled={isPending}
           />
 
           <button
             type="submit"
             className="form-button"
-            //disabled=
-            //aria-busy=
+            disabled={isPending}
+            aria-busy={isPending}
           >
-            Sign Up
-            {/*'Signing up...' when pending*/}
+            {isPending ? "Signing up..." : "Sign Up"}
           </button>
 
-          {/* Error message */}
+          {error && (
+            <div
+              id="signin-error"
+              role="alert"
+              className="sign-form-error-message"
+            >
+              {error.message}
+            </div>
+          )}
         </form>
       </div>
     </>
