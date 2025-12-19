@@ -4,6 +4,7 @@ import Dashboard from "./routes/Dashboard";
 import { createBrowserRouter } from "react-router-dom";
 import Signup from "./routes/Signup";
 import RootRedirect from "./routes/RootRirect";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -21,10 +22,10 @@ export const router = createBrowserRouter([
   {
     path: "/dashboard",
     element: (
-      <>
+      <ProtectedRoute>
         <Header />
         <Dashboard />
-      </>
+      </ProtectedRoute>
     ),
   },
 ]);
