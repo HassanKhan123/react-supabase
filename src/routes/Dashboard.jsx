@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import supabase from "../supabase-client";
 import { Chart } from "react-charts";
 import Form from "../components/Form";
-import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
-  const { users } = useAuth();
   const [metrics, setMetrics] = useState([]);
 
   const fetchMetrics = async () => {
     try {
       const { data, error } = await supabase.from("sales_deals").select(
         `
-          user_id,
-          val.sum()
+          val.sum(),
+          ...user_profiles!inner(
+            name
+          )
           `
       );
       if (error) throw error;
@@ -49,15 +49,10 @@ function Dashboard() {
     };
   }, []);
 
-  const fetchUserName = (userId) => {
-    const user = users.find((u) => u.id === userId);
-    return user ? user.name : "Unknown User";
-  };
-
   const chartData = [
     {
       data: metrics.map((m) => ({
-        primary: fetchUserName(m.user_id),
+        primary: m.name,
         secondary: m.sum,
       })),
     },
