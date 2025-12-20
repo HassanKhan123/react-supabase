@@ -1,6 +1,7 @@
-import { useActionState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useActionState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const { signUpUser } = useAuth();
@@ -8,14 +9,19 @@ const Signup = () => {
 
   const [error, submitAction, isPending] = useActionState(
     async (previousState, formData) => {
-      //1. Extract form data
       const email = formData.get("email");
       const password = formData.get("password");
+      const name = formData.get("name");
+      const accountType = formData.get("account-type");
 
-      const { success, data, error } = await signUpUser(email, password);
+      const {
+        success,
+        data,
+        error: signUpError,
+      } = await signUpUser(email, password, name, accountType);
 
-      if (error) {
-        throw new Error(error.message);
+      if (signUpError) {
+        console.log(signUpError);
       }
       if (success && data?.session) {
         navigate("/dashboard");
@@ -43,10 +49,24 @@ const Signup = () => {
           <h2 className="form-title">Sign up today!</h2>
           <p>
             Already have an account?{" "}
-            <Link className="form-link" to="/signin">
+            <Link className="form-link" to="/">
               Sign in
             </Link>
           </p>
+
+          <label htmlFor="name">Name</label>
+          <input
+            className="form-input"
+            type="text"
+            name="name"
+            id="name"
+            placeholder=""
+            required
+            aria-required="true"
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby={error ? "signup-error" : undefined}
+            disabled={isPending}
+          />
 
           <label htmlFor="email">Email</label>
           <input
@@ -58,7 +78,7 @@ const Signup = () => {
             required
             aria-required="true"
             aria-invalid={error ? "true" : "false"}
-            aria-describedby="email-error"
+            aria-describedby={error ? "signup-error" : undefined}
             disabled={isPending}
           />
 
@@ -72,9 +92,32 @@ const Signup = () => {
             required
             aria-required="true"
             aria-invalid={error ? "true" : "false"}
-            aria-describedby="password-error"
+            aria-describedby={error ? "signup-error" : undefined}
             disabled={isPending}
           />
+
+          <fieldset
+            className="form-fieldset"
+            aria-required="true"
+            aria-label="Select your role"
+          >
+            <legend>Select your role</legend>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  name="account-type"
+                  value="admin"
+                  required
+                />{" "}
+                Admin
+              </label>
+              <label>
+                <input type="radio" name="account-type" value="rep" required />{" "}
+                Sales Rep
+              </label>
+            </div>
+          </fieldset>
 
           <button
             type="submit"
@@ -87,7 +130,7 @@ const Signup = () => {
 
           {error && (
             <div
-              id="signin-error"
+              id="signup-error"
               role="alert"
               className="sign-form-error-message"
             >
